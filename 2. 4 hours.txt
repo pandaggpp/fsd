@@ -1,4 +1,4 @@
-4. Develop a Django app that displays date and time four hours ahead and four hours before as an offset of current date and time in server.
+2. Develop a Django app that displays date and time four hours ahead and four hours before as an offset of current date and time in server.
  In lab11 subfolder, make following changes to views.py:
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -9,6 +9,7 @@ def current_datetime(request):
  now = datetime.datetime.now()
  html = "<html><body><h1>It is now %s.</h1></body></html>" % now
  return HttpResponse(html)
+
 def four_hours_ahead(request):
  dt = datetime.datetime.now() + datetime.timedelta(hours=4)
  html = "<html><body><h1>After 4hour(s), it will be %s.</h1>"% (dt,)
