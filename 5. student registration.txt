@@ -1,0 +1,115 @@
+5. Develop a Django app that performs student registration to a course. It
+should also display list of students registered for any selected course.
+Create students and course as models with enrolment as ManyToMany
+field.
+
+course_search.html
+
+<html>
+<body>
+<form method="POST" action="">
+Courses
+{% csrf_token %}
+<select name="cname">
+{%for course in courses %}
+<option value="{{course.id}}">{{course.course_name}}</option>
+{% endfor %}
+</select>
+<input type="submit" value="Search">
+</form>
+</body>
+</html>
+
+selected_students.html
+
+<html>
+<body>
+<table border="10px" >
+<tr align="center">
+<th>Student Name</th>
+<th>Student USN</th>
+<th>Sem</th>
+</tr>
+{% for student in student_list %}
+<tr align="center">
+<td>{{student.student_name}}</td>
+<td>{{student.student_usn}}</td>
+<td>{{student.student_sem}}</td>
+</tr>
+{% endfor %}
+</table>
+</body>
+</html>
+
+views.py
+
+from django.http import HttpResponse
+from django.shortcuts import render
+from App5.models import Course, Student
+def course_search(request):
+ if request.method=="POST":
+  cid=request.POST.get("cname")
+  s=Student.objects.all()
+  student_list=list()
+  for student in s:
+   if student.enrolment.filter(id=cid):
+    student_list.append(student)
+  if len(student_list)==0:
+   return HttpResponse("<h1>No Students enrolled</h1>")
+  return render(request,"selected_students.html",{"student_list":student_list})
+ else:
+  courses=Course.objects.all()
+  return render(request,"course_search.html",{"courses":courses})
+
+admin.py
+
+from django.contrib import admin
+from App5.models import Course, Student
+admin.site.register(Student)
+admin.site.register(Course)
+
+models.py
+
+from django.db import models
+from django.forms import ModelForm
+# Create your models here.
+class Course(models.Model):
+ course_code=models.CharField(max_length=40)
+ course_name=models.CharField(max_length=100)
+ course_credits=models.IntegerField(blank=True, null=True)
+ def __str__(self):
+  return self.course_name
+class Student(models.Model):
+ student_usn=models.CharField(max_length=20)
+ student_name=models.CharField(max_length=100)
+ student_sem=models.IntegerField()
+ enrolment=models.ManyToManyField(Course)
+ def __str__(self):
+  return self.student_name+"("+self.student_usn+")"
+
+urls.py
+
+from django.contrib import admin
+from django.urls import path
+from App5.views import course_search
+urlpatterns = [
+ path('admin/', admin.site.urls),
+ path('course_search/', course_search),
+ 
+]
+
+setting.py
+
+Add Application name in Installed Apps
+Configure Template folder in Templates
+‘DIRS’:[BASE_DIR,’Template’]
+
+Command for Execution:
+1) python manage.py makemigrations
+2) python manage.py migrate
+3) python manage.py createsuperuser
+Username: vviet
+password: vviet123
+re-enter password: vviet123
+4) python manage.py runserver
+
