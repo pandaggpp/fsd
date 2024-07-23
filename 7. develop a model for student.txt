@@ -1,0 +1,88 @@
+2. Develop a Model form for student that contains his topic chosen for project, languages used
+and duration with a model called project.
+In Template Folder
+add_project.html
+<html>
+ <form method="post" action="">
+  {% csrf_token %}
+  <table>
+   {{ form.as_table}}
+   <tr>
+    <td>
+     <input type="submit" value="Submit">
+    </td>
+   </tr>
+  </table>
+ </form>
+</html>
+
+In App Folder 
+admin.py
+
+from django.contrib import admin
+from App.models import Student,Project
+admin.site.register(Student)
+admin.site.register(Project)
+
+models.py
+
+from django.db import models
+from django.forms import ModelForm
+ 
+class Student(models.Model):
+ student_usn=models.CharField(max_length=20)
+ student_name=models.CharField(max_length=100)
+ student_sem=models.IntegerField()
+ def __str__(self):
+  return self.student_name+"("+self.student_usn+")"
+ 
+class Project(models.Model):
+ student=models.ForeignKey(Student,on_delete=models.CASCADE)
+ ptopic=models.CharField(max_length=200)
+ plangauges=models.CharField(max_length=200)
+ pduration=models.IntegerField()
+ def __str__(self):
+  return self.student
+
+class ProjectReg(ModelForm):
+ required_css_class="required"
+ class Meta:
+  model=Project
+  fields=['student','ptopic','plangauges','pduration']
+
+views.py
+
+from django.http import HttpResponse
+from django.shortcuts import render
+from App.models import ProjectReg
+def add_project(request):
+ if request.method=="POST":
+  form=ProjectReg(request.POST)
+  if form.is_valid():
+   form.save()
+   return HttpResponse("<h1>Record inserted successfully</h1>")
+ else:
+   return HttpResponse("<h1>Record not inserted</h1>")
+ else:
+  form=ProjectReg()
+  return render(request,"add_project.html",{"form":form})
+
+In Project Folder
+urls.py
+
+from django.contrib import admin
+from django.urls import path
+from App.views import add_project
+urlpatterns = [
+ path('admin/', admin.site.urls),
+ path('add_project/', add_project),
+]
+
+Execution Commands:
+1) python manage.py makemigrations
+2) python manage.py migrate
+3) python manage.py createsuperuser
+username: vviet
+password : vviet123
+Re-password: vviet123
+4) python manage.py runserver
