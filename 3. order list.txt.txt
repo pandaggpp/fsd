@@ -1,0 +1,44 @@
+3. Develop a simple Django app that displays an unordered list of fruits and ordered list of
+selected students for an event
+
+In template Folder, Create showlist.html file and write the below code.
+<html>
+<style type="text/css">
+#i1 {background-color: lightgreen;color:brown;display:table}
+#i2 {background-color: black;color:yellow}
+</style>
+<body>
+<h1 id="i1">Unordered list of fruits</h1>
+<ul>
+{% for fruit in fruits %}
+<li>{{ fruit }}</li>
+{% endfor %}
+</ul>
+<h1 id="i2">Ordered list of Students</h1>
+<ol>
+{% for student in student_names %}
+<li>{{ student }}</li>
+{% endfor %}
+</ol>
+</body>
+</html>
+
+In App Folder
+views.py 
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.template import Template
+# Create your views here.
+def showlist(request):
+ fruits=["Mango","Apple","Bananan","Jackfruits"]
+ student_names=["Ajay","Balaji","Sony","Mohan"]
+ return render(request,'showlist.html',{"fruits":fruits,"student_names":student_names})
+
+In Project Folder
+urls.py 
+from django.contrib import admin
+from django.urls import path
+from App.views import showlist
+urlpatterns = [
+ path('', showlist),
+]
