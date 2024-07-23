@@ -1,0 +1,102 @@
+9) Develop example Django app that performs CSV and PDF generation for any
+models created in previous laboratory component.
+
+admin.py
+
+from django.contrib import admin
+from App.models import Course, Student
+admin.site.register(Student)
+admin.site.register(Course)
+
+models.py
+
+from django.db import models
+from django.forms import ModelForm
+class Course(models.Model):
+ course_code=models.CharField(max_length=40)
+ course_name=models.CharField(max_length=100)
+ course_credits=models.IntegerField(blank=True, null=True)
+ def __str__(self):
+  return self.course_name
+
+class Student(models.Model):
+ student_usn=models.CharField(max_length=20)
+ student_name=models.CharField(max_length=100)
+ student_sem=models.IntegerField()
+ enrolment=models.ManyToManyField(Course)
+ def __str__(self):
+  return self.student_name+"("+self.student_usn+")"
+
+views.py
+
+from django.http import HttpResponse
+from django.shortcuts import render
+from App.models import Course
+import csv
+def construct_csv_from_model(request):
+ courses=Course.objects.all()
+ response=HttpResponse(content_type="text/csv")
+ response['Content-Disposition'] = 'attachment;filename="courses_data.csv"'
+ writer=csv.writer(response)
+ writer.writerow(["Course Name","Course Code","Credits"])
+ for course in courses: 
+writer.writerow([course.course_name,course.course_code,course.course_credits])
+ return response
+
+urls.py
+
+from django.contrib import admin
+from django.urls import path
+from App.views import construct_csv_from_model
+urlpatterns = [
+ path('admin/', admin.site.urls),
+ path('construct_csv_from_model/', construct_csv_from_model),
+]
+
+Command for Execution
+1) python manage.py mikemegtations
+2) python manage.py migrate
+3) python manage.py createsuperuser
+username: abc123
+password: abc123
+re-password : abc123
+4) python manage.py runserver
+
+
+
+
+Develop example Django app that performs PDF generation for any models
+created in previous laboratory component
+
+views.py
+
+from django.http import HttpResponse
+from django.shortcuts import render
+from App.models import Course
+from reportlab.pdfgen import canvas
+def construct_pdf_from_model(request):
+ courses=Course.objects.all()
+ response=HttpResponse(content_type="application/pdf")
+ response['Content-Disposition'] = 'attachment;filename="courses_data.pdf"'
+ c=canvas.Canvas(response)
+ c.drawString(70,720,"Course Name")
+ c.drawString(170,720,"Course Code")
+ c.drawString(270,720,"Credits")
+ y=660
+ for course in courses:
+  c.drawString(70,y,course.course_name)
+  c.drawString(170,y,course.course_code)
+  c.drawString(270,y,str(course.course_credits))
+  y=y-60
+ c.showPage()
+ c.save()
+ return response
+
+urls.py
+
+from django.contrib import admin
+from django.urls import path
+from App.views import construct_pdf_from_model
+urlpatterns = [
+ path('admin/', admin.site.urls),
+ path('construct_pdf_from_model/', construct_pdf_from_model),
