@@ -1,0 +1,44 @@
+1) For student and course models created in Lab experiment for Module2, register admin
+interfaces, perform migrations and illustrate data entry through admin forms.
+
+admin.py
+
+from django.contrib import admin
+from App.models import Course, Student
+admin.site.register(Student)
+admin.site.register(Course)
+
+models.py
+
+from django.db import models
+class Course(models.Model):
+ course_code=models.CharField(max_length=40)
+ course_name=models.CharField(max_length=100)
+ course_credits=models.IntegerField(blank=True, null=True)
+ def __str__(self):
+  return self.course_name
+ 
+class Student(models.Model):
+ student_usn=models.CharField(max_length=20)
+ student_name=models.CharField(max_length=100)
+ student_sem=models.IntegerField()
+ enrolment=models.ManyToManyField(Course)
+def __str__(self):
+ return self.student_name+"("+self.student_usn+")"
+
+urls.py
+
+from django.contrib import admin
+from django.urls import path
+urlpatterns = [
+ path('admin/', admin.site.urls),
+]
+
+Command for Execution:
+1) python manage.py makemigrations
+2) python manage.py migrate
+3) python manage.py createsuperuser
+Username: vviet
+password: vviet123
+re-enter password: vviet123
+4) python manage.py runserver
