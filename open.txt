@@ -1,0 +1,20 @@
+py -m venv env
+
+cd env
+
+cd scripts
+
+activate
+
+cd..
+
+cd..
+
+py -m django startproject p1 / django -admin startproject pr1
+
+cd p1/cd pr1
+
+code .
+
+m django startapp app1
+
